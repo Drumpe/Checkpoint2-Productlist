@@ -1,16 +1,19 @@
-﻿public class Product
+﻿namespace Checkpoint2Productlist
 {
-    public string Category { get; set; }
-    public string Name { get; set; }
-    public decimal Price { get; set; }
-    public Product(string category, string name, decimal price)
+    public class Product
     {
-        Category = category;
-        Name = name;
-        Price = price;
+        public string Category { get; set; }
+        public string Name { get; set; }
+        public decimal Price { get; set; }
+        public Product(string category, string name, decimal price)
+        {
+            Category = category;
+            Name = name;
+            Price = price;
+        }
+        public override string ToString()
+        {
+            return $"Category: {Category}, Name: {Name}, Price: {Price:C}";
+        }
     }
-	public override string ToString()
-	{
-		return $"Category: {Category}, Name: {Name}, Price: {Price:C}";
-	}
 }
