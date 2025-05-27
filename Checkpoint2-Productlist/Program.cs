@@ -2,97 +2,7 @@
 using System.Text.Json.Serialization;
 using System.IO;
 
-class Product
-{
-    public string Category { get; set; }
-    public string Name { get; set; }
-    public decimal Price { get; set; }
-    public Product(string category, string name, decimal price)
-    {
-        Category = category;
-        Name = name;
-        Price = price;
-    }
-}
-
-class ProductList
-{
-    private List<Product> products = new List<Product>();
-    public void AddProduct(Product product)
-    {
-        products.Add(product);
-    }
-    public void DisplayProducts(IEnumerable<Product>? highlight = null)
-    {
-        if (products.Count == 0)
-        {
-            Console.WriteLine("No products to display.");
-            return;
-        }
-
-        // Sort products by price (low to high)
-        var sortedProducts = products.OrderBy(p => p.Price).ToList();
-
-        // Calculate max widths for each column
-        int catWidth = Math.Max(8, sortedProducts.Max(p => p.Category.Length));
-        int nameWidth = Math.Max(8, sortedProducts.Max(p => p.Name.Length));
-        int priceWidth = 10;
-
-        // Print header
-        Console.WriteLine(
-            "Category".PadRight(catWidth) + " | " +
-            "Name".PadRight(nameWidth) + " | " +
-            "Price".PadRight(priceWidth)
-        );
-        Console.WriteLine(new string('-', catWidth + nameWidth + priceWidth + 6));
-
-        // Print products, highlighting if needed
-        decimal total = 0;
-        foreach (var product in sortedProducts)
-        {
-            bool isHighlighted = highlight != null && highlight.Contains(product);
-            if (isHighlighted)
-                Console.ForegroundColor = ConsoleColor.Yellow;
-
-            Console.WriteLine(
-                product.Category.PadRight(catWidth) + " | " +
-                product.Name.PadRight(nameWidth) + " | " +
-                product.Price.ToString("C").PadRight(priceWidth)
-            );
-
-            if (isHighlighted)
-                Console.ResetColor();
-
-            total += product.Price;
-        }
-
-        // Print total price
-        Console.WriteLine(new string('-', catWidth + nameWidth + priceWidth + 6));
-        Console.ForegroundColor = ConsoleColor.Green;
-        Console.WriteLine("Total price: ".PadLeft(catWidth + nameWidth + 3) + total.ToString("C").PadLeft(priceWidth));
-        Console.ResetColor();
-    }
-
-
-    public List<Product> Search(string term)
-    {
-        return products.Where(p => p.Name.Contains(term, StringComparison.CurrentCultureIgnoreCase) || p.Category.Contains(term, StringComparison.CurrentCultureIgnoreCase)).ToList();
-    }
-
-    public Product? SearchByName(string name)
-    {
-        return products.FirstOrDefault(p => p.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
-    }
-
-    public List<Product> GetAll() => new List<Product>(products);
-
-    public void SetAll(List<Product> newProducts)
-    {
-        products = newProducts ?? new List<Product>();
-    }
-}
-
-class Menu
+public class Menu
 {
     public void Show()
     {
@@ -101,6 +11,7 @@ class Menu
         Console.ResetColor();
         Console.WriteLine("A - Add Product");
         Console.WriteLine("P - List Products");
+        Console.WriteLine("H - Highlight Product");
         Console.WriteLine("F - Find Product");
         Console.WriteLine("E - Edit Product");
         Console.WriteLine("S - Save");
@@ -120,7 +31,7 @@ class Menu
     }
 }
 
-class Program
+public static class Program
 {
     private const string ProductsFileName = "products.json";
 
@@ -141,8 +52,11 @@ class Program
                 case 'P':
                     productList.DisplayProducts();
                     break;
+                case 'H':
+                    HighlightProduct(productList);
+                    break;
                 case 'F':
-                    SearchProduct(productList);
+                    FindProduct(productList);
                     break;
                 case 'E':
                     EditProduct(productList);
@@ -188,16 +102,15 @@ class Program
         Console.ResetColor();
     }
 
-    static void SearchProduct(ProductList productList)
+    static void HighlightProduct(ProductList productList)
     {
         Console.ForegroundColor = ConsoleColor.Cyan;
-        Console.WriteLine("--- Find Product ---");
+        Console.WriteLine("--- Highlight Product ---");
         Console.ResetColor();
-        Console.Write("Enter a name or product: ");
+        Console.Write("Enter a name or category: ");
         string term = Console.ReadLine() ?? "";
         var found = productList.Search(term);
 
-        // Always display the full list, highlighting found items
         if (productList.GetAll().Count == 0)
         {
             Console.ForegroundColor = ConsoleColor.Red;
@@ -216,6 +129,27 @@ class Program
         }
     }
 
+    static void FindProduct(ProductList productList)
+    {
+        Console.ForegroundColor = ConsoleColor.Cyan;
+        Console.WriteLine("--- Find Product ---");
+        Console.ResetColor();
+        Console.Write("Enter a name or category: ");
+        string term = Console.ReadLine() ?? "";
+        var found = productList.Search(term);
+
+        if (found.Count == 0)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("No products found.");
+            Console.ResetColor();
+        }
+        else
+        {
+			productList.DisplayProduct(found) ;
+        }
+    }
+
     static void EditProduct(ProductList productList)
     {
         Console.ForegroundColor = ConsoleColor.Cyan;
@@ -223,7 +157,7 @@ class Program
         Console.ResetColor();
         Console.Write("Enter product name to edit: ");
         string name = Console.ReadLine() ?? "";
-        var found = productList.SearchByName(name);
+        var found = productList.SearchByNameOrCategory(name);
         if (found == null)
         {
             Console.ForegroundColor = ConsoleColor.Red;
