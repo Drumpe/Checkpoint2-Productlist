@@ -1,10 +1,6 @@
-﻿using System.Text.Json;
-using System.Text.Json.Serialization;
-using System.IO;
-
-public class Menu
+﻿public class Menu
 {
-    public void Show()
+    public static void Show()
     {
         Console.ForegroundColor = ConsoleColor.Cyan;
         Console.WriteLine("\n--- Product List Menu ---");
@@ -22,7 +18,7 @@ public class Menu
         Console.ResetColor();
     }
 
-    public char GetChoice()
+    public static char GetChoice()
     {
         string? input = Console.ReadLine();
         if (string.IsNullOrWhiteSpace(input))
@@ -38,13 +34,12 @@ public static class Program
     static void Main()
     {
         var productList = new ProductList();
-        var menu = new Menu();
         bool running = true;
 
         while (running)
         {
-            menu.Show();
-            switch (menu.GetChoice())
+			Menu.Show();
+            switch (Menu.GetChoice())
             {
                 case 'A':
                     AddProduct(productList);

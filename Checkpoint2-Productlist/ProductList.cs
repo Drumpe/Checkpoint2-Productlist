@@ -1,6 +1,6 @@
 ﻿public class ProductList
 {
-	private List<Product> products = new List<Product>();
+	private List<Product> products = [];
 	public void AddProduct(Product product)
 	{
 		products.Add(product);
