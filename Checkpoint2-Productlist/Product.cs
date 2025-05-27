@@ -9,4 +9,8 @@
         Name = name;
         Price = price;
     }
+	public override string ToString()
+	{
+		return $"Category: {Category}, Name: {Name}, Price: {Price:C}";
+	}
 }

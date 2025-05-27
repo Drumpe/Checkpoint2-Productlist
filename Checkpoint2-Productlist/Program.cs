@@ -11,6 +11,7 @@ public class Menu
         Console.ResetColor();
         Console.WriteLine("A - Add Product");
         Console.WriteLine("P - List Products");
+        Console.WriteLine("H - Highlight Product");
         Console.WriteLine("F - Find Product");
         Console.WriteLine("E - Edit Product");
         Console.WriteLine("S - Save");
@@ -51,8 +52,11 @@ public static class Program
                 case 'P':
                     productList.DisplayProducts();
                     break;
+                case 'H':
+                    HighlightProduct(productList);
+                    break;
                 case 'F':
-                    SearchProduct(productList);
+                    FindProduct(productList);
                     break;
                 case 'E':
                     EditProduct(productList);
@@ -98,16 +102,15 @@ public static class Program
         Console.ResetColor();
     }
 
-    static void SearchProduct(ProductList productList)
+    static void HighlightProduct(ProductList productList)
     {
         Console.ForegroundColor = ConsoleColor.Cyan;
-        Console.WriteLine("--- Find Product ---");
+        Console.WriteLine("--- Highlight Product ---");
         Console.ResetColor();
-        Console.Write("Enter a name or product: ");
+        Console.Write("Enter a name or category: ");
         string term = Console.ReadLine() ?? "";
         var found = productList.Search(term);
 
-        // Always display the full list, highlighting found items
         if (productList.GetAll().Count == 0)
         {
             Console.ForegroundColor = ConsoleColor.Red;
@@ -126,6 +129,27 @@ public static class Program
         }
     }
 
+    static void FindProduct(ProductList productList)
+    {
+        Console.ForegroundColor = ConsoleColor.Cyan;
+        Console.WriteLine("--- Find Product ---");
+        Console.ResetColor();
+        Console.Write("Enter a name or category: ");
+        string term = Console.ReadLine() ?? "";
+        var found = productList.Search(term);
+
+        if (found.Count == 0)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("No products found.");
+            Console.ResetColor();
+        }
+        else
+        {
+			productList.DisplayProduct(found) ;
+        }
+    }
+
     static void EditProduct(ProductList productList)
     {
         Console.ForegroundColor = ConsoleColor.Cyan;
@@ -133,7 +157,7 @@ public static class Program
         Console.ResetColor();
         Console.Write("Enter product name to edit: ");
         string name = Console.ReadLine() ?? "";
-        var found = productList.SearchByName(name);
+        var found = productList.SearchByNameOrCategory(name);
         if (found == null)
         {
             Console.ForegroundColor = ConsoleColor.Red;
