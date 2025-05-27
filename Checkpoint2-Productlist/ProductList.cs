@@ -20,7 +20,7 @@
 		// Calculate max widths for each column
 		int catWidth = Math.Max(8, sortedProducts.Max(p => p.Category.Length));
 		int nameWidth = Math.Max(8, sortedProducts.Max(p => p.Name.Length));
-		int priceWidth = 10;
+		int priceWidth = Math.Max(10, sortedProducts.Max(p => p.Price.ToString("C").Length));
 
 		// Print header
 		Console.WriteLine(
